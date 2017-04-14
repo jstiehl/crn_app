@@ -876,7 +876,7 @@ let datasetStore = Reflux.createStore({
                 files.sortTree(job.logs);
 
                 // check if job should be polled
-                let status     = job.agave.status;
+                let status     = job.agave ? job.agave.status : job.status;
                 let failed     = status === 'FAILED';
                 let finished   = status === 'FINISHED';
                 let hasResults = job.results && job.results.length > 0;
