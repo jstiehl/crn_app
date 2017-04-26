@@ -1079,27 +1079,21 @@ let datasetStore = Reflux.createStore({
      */
     getResultDownloadTicket(snapshotId, jobId, file, callback) {
         let filePath = file === 'all' ? file : file.path;
-        crn.getResultDownloadTicket(snapshotId, jobId, filePath, (err, res) => {
-            let ticket      = res.body._id;
-            let fileName    = filePath.split('/')[filePath.split('/').length - 1];
-            let downloadUrl = config.crn.url + 'jobs/' + jobId + '/results/' + fileName + '?ticket=' + ticket;
-            callback(downloadUrl);
-        }, {snapshot: true});
+        callback('https://s3.amazonaws.com/' + filePath);
+        //When we have private data we will likely need to reuse this call to the server to get a download "ticket" from s3
+        // leaving this code in for now since we will most likely just reuse/refactor
+        // crn.getResultDownloadTicket(snapshotId, jobId, filePath, (err, res) => {
+        //     let ticket      = res.body._id;
+        //     let fileName    = filePath.split('/')[filePath.split('/').length - 1];
+        //     let downloadUrl = config.crn.url + 'jobs/' + jobId + '/results/' + fileName + '?ticket=' + ticket;
+        //     callback(downloadUrl);
+        // }, {snapshot: true});
     },
 
     /**
      * DisplayFile
      */
     displayFile(snapshotId, jobId, file, callback) {
-        if (jobId) {
-            this.getResultDownloadTicket(snapshotId, jobId, file, (link) => {
-                requestAndDisplay(link);
-            });
-        } else {
-            this.getFileDownloadTicket(file, (link) => {
-                requestAndDisplay(link);
-            });
-        }
 
         let requestAndDisplay = (link) => {
             let modals = this.data.modals;
@@ -1128,6 +1122,17 @@ let datasetStore = Reflux.createStore({
                 });
             }
         };
+
+        if (jobId) {
+            this.getResultDownloadTicket(snapshotId, jobId, file, (link) => {
+                requestAndDisplay(link);
+            });
+        } else {
+            this.getFileDownloadTicket(file, (link) => {
+                requestAndDisplay(link);
+            });
+        }
+
     },
 
     // Snapshots ---------------------------------------------------------------------

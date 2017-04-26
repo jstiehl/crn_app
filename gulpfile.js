@@ -90,7 +90,7 @@ gulp.task('buildApp', function(cb) {
         .pipe(buffer())
         .pipe(envify(process.env))
         .pipe(sourcemaps.init({loadMaps: true}))
-        .pipe(uglify())
+        .pipe(gulpif(p.env === 'prod', uglify()))
         .pipe(cachebust.resources())
         .pipe(sourcemaps.write('./', {
             sourceMappingURL: function (file) {
@@ -125,7 +125,7 @@ gulp.task('watchApp', function() {
             .pipe(buffer())
             .pipe(envify(process.env))
             .pipe(buffer())
-            .pipe(uglify())
+            .pipe(gulpif(p.env === 'prod', uglify()))
             .pipe(gulp.dest(p.dist))
             .pipe(reload({stream: true}));
     }
